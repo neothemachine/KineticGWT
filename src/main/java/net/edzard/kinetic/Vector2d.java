@@ -147,18 +147,20 @@ public class Vector2d implements Serializable {
 	 * Subtract a given vector from this one.
 	 * @param other The other vector.
 	 */
-	public final void sub(Vector2d other) {
+	public final Vector2d sub(Vector2d other) {
 		 this.x -= other.x;
 	     this.y -= other.y;
+	     return this;
 	}
 
 	/**
 	 * Add a given vector to this one.
 	 * @param other The other vector.
 	 */
-	public final void add(Vector2d other) {
+	public final Vector2d add(Vector2d other) {
 		 this.x += other.x;
 	     this.y += other.y;
+	     return this;
 	}
 
 	/**
@@ -166,18 +168,20 @@ public class Vector2d implements Serializable {
 	 * @param x x component of the other vector
 	 * @param y y component of the other vector
 	 */
-	public final void add(double x, double y) {
+	public final Vector2d add(double x, double y) {
 		 this.x += x;
 	     this.y += y;
+	     return this;
 	}
 	
 	/**
 	 * Normalizes the length of vector to 1, while keeping the direction.
 	 */
-	public final void normalize() {
+	public final Vector2d normalize() {
 		double n = 1.0/Math.sqrt(this.x*this.x + this.y*this.y);
         this.x *= n;
         this.y *= n;
+        return this;
 	}
 
 	/**
@@ -185,9 +189,10 @@ public class Vector2d implements Serializable {
 	 * This keeps the direction, but alters the vector's length.
 	 * @param amount The amount to scale the vector.
 	 */
-	public final void scale(double amount) {
+	public final Vector2d scale(double amount) {
 		this.x *= amount;
 		this.y *= amount;
+		return this;
 	}
 	
 	/**
