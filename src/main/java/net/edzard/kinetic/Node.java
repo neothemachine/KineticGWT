@@ -3,7 +3,12 @@ package net.edzard.kinetic;
 import java.util.Arrays;
 import java.util.List;
 
+import net.edzard.kinetic.event.EventTypeBasic;
+import net.edzard.kinetic.event.IEventListener;
+import net.edzard.kinetic.event.IEventTypeEnum;
+
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
 
 /**
  * Base class for all of the Kinetic classes.
@@ -18,45 +23,139 @@ import com.google.gwt.core.client.JavaScriptObject;
  */
 public abstract class Node extends JavaScriptObject {
 	
-	/**
-	 * Defines signature for event callbacks 
-	 * @author Ed
-	 */
-	public interface EventListener {
-
-		/**
-		 * Handles an event.
-		 * Called by Kinetic.
-		 * @return True, if the event should be processed further by bubbling up in the hierarchy. False, if bubbling should stop. 
-		 */
-		public boolean handle();
+	public enum Attr
+	{
+		X,
+		Y
 	}
 	
-	/**
-	 * Constraints freedom of direction for dragging operations.
-	 * @author Ed
-	 */
-	public enum DragConstraint {
-		/** Full freedom of direction */
-		NONE,
-		/** Only horizontally dragable*/
-		HORIZONTAL,
-		/** Only vertically dragable*/
-		VERTICAL
-	}
-
 	/**
 	 * Protected Ctor.
 	 * Makes JSNI (GWT) happy
 	 */
 	protected Node() {}
 	
+	/**
+	 * Create a simple clone with identical attributes.
+	 */
+	public native final Node clone() /*-{
+		return this.clone();
+	}-*/;
+	
+	/**
+	 * Remove and destroy self.
+	 */
+	public native final void destroy() /*-{
+		return this.destroy();
+	}-*/;
+	
+	/**
+	 * If used with groups and shapes, the layer is cleared, and just that node is drawn.
+	 */
+	public native final void draw() /*-{
+		this.draw();
+	}-*/;
+	
+	/**
+	 * Get stage ancestor.
+	 */
+	public final native Stage getStage() /*-{
+		this.getStage();
+	}-*/;
+	
+	/**
+	 * Gets layer ancestor.
+	 * @return container layer
+	 */
 	public native final Layer getLayer() /*-{
 		return this.getLayer();
 	}-*/;
 	
-	public native final Node getParent() /*-{
+	/**
+	 * Gets the parent container which contains this node.
+	 * @return parent container
+	 */
+	public native final Container getParent() /*-{
 		return this.getParent();
+	}-*/;
+	
+	/**
+	 * Is this node embedded in a kinetic environment?
+	 */
+	public final boolean isRegistered()
+	{
+		return getParent() != null;
+	}
+	
+	/**
+	 * Gets attribute value for specified key. Can be Kinetic attrs and custom attrs as well.
+	 * @param attr the key
+	 * @return the value
+	 */
+	public native final JavaScriptObject getAttr(String attr) /*-{
+		return this.getAttr(attr);
+	}-*/;
+	
+	/**
+	 * Sets an attribute value for specified key.
+	 * Can be used to set Kinetic attrs, or even custom attrs.
+	 * TODO: Custom attrs changes can also be subscribed to, just like Kinetic attrs. i.e. shape.on('myAttrChange', ...);
+	 * @param attr the key
+	 */
+	public native final void setAttr(String attr, JavaScriptObject object) /*-{
+		return this.setAttr(attr, object);
+	}-*/;
+	
+	/**
+	 * Gets the type of this node. One of: "Stage", "Layer", "Group", or "Shape".
+	 * @return node type
+	 */
+	public native final String getNodeType() /*-{
+		return this.getType();
+	}-*/;
+	
+	/**
+	 * Gets the class name of this node, e.g. "Stage", "Layer", "Circle", "Rect" etc.
+	 * @return class name
+	 */
+	public native final String getClassName() /*-{
+		return this.getClassName();
+	}-*/;
+	
+	/**
+	 * Gets the width of the node.
+	 * @return node Width of the node
+	 */
+	public native final double getWidth() /*-{
+		if (this.getWidth() == "auto") return 0;
+		else return this.getWidth();
+	}-*/;
+	
+	/**
+	 * Sets the width of the node. Uses bounding boxes around select nodes. For example, to define the size of an ellipse, 
+	 * you could set its width and height rather than setting the radius.
+	 * @param width pixels in width
+	 */
+	public native final void setWidth(double width) /*-{
+		return this.setWidth(width);
+	}-*/;
+	
+	/**
+	 * Gets the width of the node.
+	 * @return node Width of the node
+	 */
+	public native final double getHeight() /*-{
+		if (this.getWidth() == "auto") return 0;
+		else return this.getHeight();
+	}-*/;
+	
+	/**
+	 * Sets the height of the node. Uses bounding boxes around select nodes. For example, to define the size of an ellipse, 
+	 * you could set its width and height rather than setting the radius.
+	 * @param width pixels in height
+	 */
+	public native final void setHeight(double height) /*-{
+		return this.setHeight(height);
 	}-*/;
 	
 	/**
@@ -193,6 +292,14 @@ public abstract class Node extends JavaScriptObject {
 	}-*/;
 	
 	/**
+	 * Move this node into the specified container.
+	 * @param newContainer The container to move this node to.
+	 */
+	public final native void moveTo(Container newContainer) /*-{
+		this.moveTo(newContainer);
+	}-*/;
+	
+	/**
 	 * Moves the node to the highest Z position.
 	 * It will be in front of all of the other nodes on a given layer.
 	 * Node needs to belong to a layer.
@@ -244,12 +351,19 @@ public abstract class Node extends JavaScriptObject {
 		this.setZIndex(z);
 	}-*/;
 
-		
 	/**
 	 * Enable or disable event handling.
 	 * @param listening True, if events should be handled. False, otherwise.
 	 */
-	public final native void setListening(boolean listening) /*-{
+	public final void setListening(boolean listening)
+	{
+		setListeningPrivate(listening);
+		if(isRegistered())
+		{
+			getStage().drawHit();
+		}
+	}
+	protected final native void setListeningPrivate(boolean listening) /*-{
 		this.setListening(listening);
 	}-*/;
 	
@@ -377,86 +491,43 @@ public abstract class Node extends JavaScriptObject {
 	}-*/;
 
 	/**
-	 * Receive the drag constraints for this node.
-	 * @return One of the possible drag constraints.
-	 */
-	public final native DragConstraint getDragConstraint() /*-{
-		if (this.getDetectionType() != null) 
-			return @net.edzard.kinetic.Node.DragConstraint::valueOf(Ljava/lang/String;)(this.getDragConstraint().toUpperCase());
-		else return null;
-	}-*/;
-
-	/**
-	 * Assign drag constraints to this node.
-	 * @param type One of the possible drag constraints
-	 */
-	public final native void setDragConstraint(DragConstraint type) /*-{
-		this.setDragConstraint(type.@net.edzard.kinetic.Node.DragConstraint::toString()().toLowerCase());
-	}-*/;
-	
-	/**
-	 * Retrieve the drag bounds for this node.
-	 * @return The drag bounds as two points (left/top and right/bottom) in node coordination space
-	 */
-	public final native Box2d getDragBounds() /*-{
-		var bounds = this.getDragBounds();
-		if (bounds != null) {
-			box = @net.edzard.kinetic.Box2d::new()();
-			if (bounds.left != null) box.@net.edzard.kinetic.Box2d::left = bounds.left;
-			if (bounds.top != null) box.@net.edzard.kinetic.Box2d::top = bounds.top;
-			if (bounds.right != null) box.@net.edzard.kinetic.Box2d::right = bounds.right;
-			if (bounds.bottom != null) box.@net.edzard.kinetic.Box2d::bottom = bounds.bottom;
-			return box;
-		} else return null;
-	}-*/;
-
-	/** 
-	 * Assign drag bounds for this node.
-	 * @param box The drag bounds as two points (left/top and right/bottom) in node coordination space
-	 */
-	public final native void setDragBounds(Box2d box) /*-{
-		var bounds = {};
-		if (box.@net.edzard.kinetic.Box2d::left != @java.lang.Double::NaN) bounds.left = box.@net.edzard.kinetic.Box2d::left;
-		if (box.@net.edzard.kinetic.Box2d::top != @java.lang.Double::NaN) bounds.top = box.@net.edzard.kinetic.Box2d::top;
-		if (box.@net.edzard.kinetic.Box2d::right != @java.lang.Double::NaN) bounds.right = box.@net.edzard.kinetic.Box2d::right;
-		if (box.@net.edzard.kinetic.Box2d::bottom != @java.lang.Double::NaN) bounds.bottom = box.@net.edzard.kinetic.Box2d::bottom;
-		this.setDragBounds(bounds);
-	}-*/;	
-	
-	/**
-	 * Clear the node's drag bounds.
-	 */
-	public final native void clearDragBounds() /*-{
-		this.setDragBounds(null);
-	}-*/;
-	
-	/**
-	 * Add an event listener to the node.
+	 * Register an event listener for a single event. 
 	 * @param type A single event type to listen for.
 	 * @param handler The handler.
 	 */
-	public final void addEventListener(EventType type, EventListener handler) {
+	public final void addEventListener(IEventTypeEnum type, IEventListener handler) {
 		addEventListener(Arrays.asList(type), handler);
 	}
 	
 	/**
-	 * Create a list of event types as strings.
-	 * Used internally to interface with Javascript.
+	 * Register an event listener for a multitude of events.
+	 * @param type List of events to listen for
+	 * @param handler The handler.
+	 */
+	public final void addEventListener(List<IEventTypeEnum> eventTypes, IEventListener handler)
+	{
+		addEventListeners(eventListToString(eventTypes), handler);
+	}
+	
+	/**
+	 * Convert a list of event types to a single string, as defined by the KineticJS standard.
 	 * @param eventTypes The event types
 	 * @return A string of the event types
 	 */
-	private final static String createEventTypeString(List<EventType> eventTypes) {
+	protected final static String eventListToString(List<IEventTypeEnum> eventTypes)
+	{
 		final StringBuffer sb = new StringBuffer();
-		for (EventType type: eventTypes) {
-			sb.append(type.toString().toLowerCase()).append(" ");
+		for (IEventTypeEnum type: eventTypes)
+		{
+			sb.append(type.toNativeEvent()).append(" "); // toLowerCase() would not work with the new Stage events because they contain a capital letter
 		}
 		return sb.toString().trim();
 	}
 	
 	/**
-	 * Add a multi-event listener to the node.
-	 * @param eventTypes A number of events to listen to
-	 * @param handler The handler.
+	 * Add a (possibly) multi-event listener to the node.
+	 * @param eventString The string containing events to register.
+	 * @param handler The handler to execute.
 	 */
 	// Seems to be buggy in kineticjs. Always getting mousemove events
 	// TODO Maik: It's not buggy, it just fails and then creates too many events due to the failure.
@@ -464,8 +535,9 @@ public abstract class Node extends JavaScriptObject {
 	//             a mismatch between event types
 	//             Touch also needs to be handled differently if evt should be used.
 	//       quick fix: ignore evt object
-	public final native void addEventListener(List<EventType> eventTypes, EventListener handler) /*-{	
-		this.on(@net.edzard.kinetic.Node::createEventTypeString(Ljava/util/List;)(eventTypes), function(evt) {
+	// TODO: SkyCrawl: I may be wrong (haven't tested it) but I think there's not going to be a problem with this anymore. Event system has changed quite a bit.
+	protected final native void addEventListeners(String eventString, IEventListener handler) /*-{	
+		this.on(eventString, function(evt) {
 //			if (evt != null) {
 //				console.log(evt.type);
 //				var javaEvt = @net.edzard.kinetic.Event::new(Lnet/edzard/kinetic/Event$Type;Lnet/edzard/kinetic/Event$Button;II)(
@@ -478,7 +550,7 @@ public abstract class Node extends JavaScriptObject {
 //				var bubble = handler.@net.edzard.kinetic.Node.EventListener::handle(Lnet/edzard/kinetic/Event;)(javaEvt);
 //				evt.cancelBubble = !bubble;
 //			} else {
-				handler.@net.edzard.kinetic.Node.EventListener::handle()();
+				handler.@net.edzard.kinetic.event.IEventListener::handle(Lnet/edzard/kinetic/event/KineticEvent;)(evt);
 //			}
 		});
 	}-*/;
@@ -487,18 +559,34 @@ public abstract class Node extends JavaScriptObject {
 	 * Remove an event listener from the node.
 	 * @param type The event Type to stop listening to
 	 */
-	public final void removeEventListener(EventType type) {
+	public final void removeEventListener(IEventTypeEnum type)
+	{
 		removeEventListener(Arrays.asList(type));
 	}
-	
 
 	/**
 	 * Remove an event listener from the node.
 	 * @param eventTypes A number of event types to stop listening to
 	 */
 	// Might be buggy in Kineticjs 	
-	public final native void removeEventListener(List<EventType> eventTypes) /*-{
-		this.off(@net.edzard.kinetic.Node::createEventTypeString(Ljava/util/List;)(eventTypes));
+	public final void removeEventListener(List<IEventTypeEnum> eventTypes)
+	{
+		removeEventListeners(eventListToString(eventTypes));
+	}
+	
+	/**
+	 * Remove listener for specified events from this node.
+	 * @param eventTypes A (possibly) number of event types to stop listening to
+	 */
+	protected final native void removeEventListeners(String eventTypes) /*-{
+		this.off(eventTypes);
+	}-*/;
+	
+	/**
+	 * Removes this node from its parent but doesn't destroy.
+	 */
+	public final native void remove() /*-{
+		this.remove();
 	}-*/;
 	
 	/**
@@ -506,45 +594,45 @@ public abstract class Node extends JavaScriptObject {
 	 * This will trigger the appropriate listeners with empty event objects.
 	 * @param type The event type to simulate
 	 */
-	public final native void simulate(EventType type) /*-{
-		this.simulate(type.@net.edzard.kinetic.Event.Type::toString()().toLowerCase());
+	public final native void simulate(EventTypeBasic type) /*-{
+		this.simulate(type.@net.edzard.kinetic.event.EventSimulated.Type::toString()().toLowerCase());
 	}-*/;
 	
 	/**
-	 * Animate a transition of the node.
-	 * Used internally to compose transitions.
-	 * Don't use directly - use methods exposed by specialized shapes.
-	 * @param target The target node (has to be the same type of node as the one on which this method is called)
-	 * @param sb The composition buffer for the transition configuration
-	 * @param duration The duration of the transition
-	 * @param ease An easing function
-	 * @param callback Will be called at the end of the transition
-	 * @return An object to control the transition animation
+	 * Write the current node's definition to JSON.
+	 * Doesn't serialize functions and images. These need to be written manually.
+	 * @return A JSON representation of the node
 	 */
-	final Transition transitionToNode(Node target, StringBuffer sb, double duration, EasingFunction ease, Runnable callback) {
-		if (this.getPosition() != target.getPosition()) sb.append("x:").append(target.getPosition().x).append(",").append("y:").append(target.getPosition().y).append(",");
-		if (this.getOpacity() != target.getOpacity()) sb.append("opacity:").append(target.getOpacity()).append(",");
-		if (!this.getScale().equals(target.getScale())) sb.append("scale:{x:").append(target.getScale().x).append(",").append("y:").append(target.getScale().y).append("},");
-		if (this.getRotation() != target.getRotation()) sb.append("rotation:").append(target.getRotation()).append(",");
-		if (!this.getOffset().equals(target.getOffset())) sb.append("centerOffset:{x:").append(target.getOffset().x).append(",").append("y:").append(target.getOffset().y).append("},");
-		if (ease != null) sb.append("easing:\'").append(ease.toString()).append("\',");
-		sb.append("duration:").append(duration);
-		return transitionToInternal(sb.toString(), callback);
-	}
+	public final native String toJSON() /*-{
+		return this.toJSON();
+	}-*/;
 	
 	/**
-	 * Set the transition string.
-	 * Used internally to interface with Javascript.
-	 * @param configStr The transition's configuration string
-	 * @param callback Will be called at the end of the transition
-	 * @return An object to control the transition animation
+	 * Writes the current node's definition to JSON. Only serializes attributes defined in the parameter. Doesn't
+	 * serialize functions, images, DOM objects or objects with methods.
+	 * 
+	 * RED ALERT: this method uses a modified version of kinetic's "toJSON" method (see below) which is not
+	 * a part of the standard KineticJS distribution and hence this method is deprecated.
+	 * It is safe to use this method with the bundled "dev" version, but beware using it in production with
+	 * a "min" version for example. Should you choose to do so, you can always add the modified function
+	 * yourselves:
+	 * 
+	 * toMyJSON: function(attrsToPrint) { return JSON.stringify(this.toObject(), attrsToPrint, '\t'); }
+	 * 
+	 * @param attrsToPrint attributes to serialize
+	 * Recommended default code:
+	 * JsArrayString jsonAttrsToSerialize = (JsArrayString) JsArrayString.createArray();
+	 * jsonAttrsToSerialize.push("attrs");
+	 * jsonAttrsToSerialize.push("x");
+	 * jsonAttrsToSerialize.push("y");
+	 * jsonAttrsToSerialize.push("id");
+	 * jsonAttrsToSerialize.push("className");
+	 * jsonAttrsToSerialize.push("children");
+	 * 
+	 * @return A JSON representation of the node. Formatted with a tabulator.
 	 */
-	private final native Transition transitionToInternal(String configStr, Runnable callback) /*-{
-		
-		eval("var config = {" + configStr + "}");
-		if (callback != null) {
-			config.callback = function() {callback.@java.lang.Runnable::run()();};
-		}
-		return this.transitionTo(config);
+	@Deprecated
+	public final native String toMyJSON(JsArrayString attrsToPrint) /*-{
+		return this.toMyJSON(attrsToPrint);
 	}-*/;
 }
