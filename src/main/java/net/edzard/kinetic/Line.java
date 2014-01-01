@@ -9,7 +9,7 @@ import java.util.List;
  * Lines can have a style (e.g. they can be dashed).
  * @author Ed
  */
-public class Line extends Polygon {	// Makes sense from code re-use point of view: Polygon defines "points"
+public class Line extends Shape {
 
 	/**
 	 * Pre-defined line styles.
@@ -149,29 +149,5 @@ public class Line extends Polygon {	// Makes sense from code re-use point of vie
 	 */
 	public final void setLineStyle(LineStyle style) {
 		setDashes(style.dashes);
-	}
-	
-	/**
-	 * Animate a linear transition of this line shape.
-	 * @param target Another line shape - defines the characteristics that the current line shape will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @return An object for controlling the transition.
-	 */
-	public final Transition transitionTo(Line target, double duration) {
-		return transitionTo(target, duration, null, null);
-	}
-	
-	/**
-	 * Animate a transition of this line shape.
-	 * @param target Another line shape - defines the characteristics that the current line shape will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @param ease An easing function that defines how the transition will take place
-	 * @param callback A function that will be called at the end of the animation
-	 * @return An object for controlling the transition.
-	 */
-	// Delegates to shape (no special properties to animate)
-	public final Transition transitionTo(Line target, double duration, EasingFunction ease, Runnable callback) {
-		StringBuffer sb = new StringBuffer();
-		return transitionToShape(target, sb, duration, ease, callback);
 	}
 }

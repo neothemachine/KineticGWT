@@ -78,7 +78,7 @@ public class Text extends Shape {
 	}-*/;
 	
 	/**
-	 * Retrieve the font size used by this text shape.
+	 * Retrieve the font size (in pixels) used by this text shape.
 	 * @return The font size
 	 */
 	public final native int getFontSize() /*-{
@@ -86,7 +86,7 @@ public class Text extends Shape {
 	}-*/;
 	
 	/**
-	 * Assign the font size used by this text shape.
+	 * Assign the font size (in pixels) used by this text shape.
 	 * @param size A font size
 	 */
 	public final native void setFontSize(int size) /*-{
@@ -215,23 +215,6 @@ public class Text extends Shape {
 	}-*/;
 	
 	/**
-	 * Retrieve the width of this text shape.
-	 * @return The width
-	 */
-	public final native double getWidth() /*-{
-		if (this.getWidth() == "auto") return 0;
-		else return this.getWidth();
-	}-*/;
-	
-	/**
-	 * Set the width of this text shape.
-	 * @param width The width
-	 */
-	public final native void setWidth(double width) /*-{
-		this.setWidth(width);
-	}-*/;
-	
-	/**
 	 * Retrieve Vertical extents of the text.
 	 * @return The text height in pixels
 	 */
@@ -246,47 +229,4 @@ public class Text extends Shape {
 	public final native int getTextWidth() /*-{
 		return this.getTextWidth();
 	}-*/;
-	
-	/**
-	 * Retrieve height of the logical box around the text.
-	 * @return The box height
-	 */
-	public final native double getBoxHeight() /*-{
-		return this.getBoxHeight();
-	}-*/;
-	
-	/**
-	 * Retrieve width of the logical box around the text.
-	 * @return The box width
-	 */
-	public final native int getBoxWidth() /*-{
-		return this.getBoxWidth();
-	}-*/;
-	
-	/**
-	 * Animate a linear transition of this text shape.
-	 * @param target Another text shape - defines the characteristics that the current text shape will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @return An object for controlling the transition.
-	 */
-	public final Transition transitionTo(Text target, double duration) {
-		return transitionTo(target, duration, null, null);
-	}
-	
-	/**
-	 * Animate a transition of this text shape.
-	 * @param target Another text shape - defines the characteristics that the current text shape will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @param ease An easing function that defines how the transition will take place
-	 * @param callback A function that will be called at the end of the animation
-	 * @return An object for controlling the transition.
-	 */
-	public final Transition transitionTo(Text target, double duration, EasingFunction ease, Runnable callback) {
-		StringBuffer sb = new StringBuffer();
-		if (this.getFontSize() != target.getFontSize()) sb.append("fontSize:").append(target.getFontSize()).append(",");
-		if (this.getTextStrokeWidth() != target.getTextStrokeWidth()) sb.append("textStrokeWidth:").append(target.getTextStrokeWidth()).append(",");
-		if (this.getPadding() != target.getPadding()) sb.append("padding:").append(target.getPadding()).append(",");
-		if (this.getWidth() != target.getWidth()) sb.append("width:").append(target.getWidth()).append(",");
-		return transitionToShape(target, sb, duration, ease, callback);
-	}
 }
