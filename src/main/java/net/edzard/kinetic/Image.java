@@ -58,38 +58,6 @@ public class Image extends Shape {
 	}
 	
 	/**
-	 * Retrieve the horizontal extent of the image shape.
-	 * @return The image width
-	 */
-	private final native double getWidth() /*-{
-		return this.getWidth();
-	}-*/;
-
-	/**
-	 * Assign the horizontal extent of the image shape.
-	 * @return The image width
-	 */
-	private final native void setWidth(double width) /*-{
-		this.setWidth(width);
-	}-*/;
-
-	/**
-	 * Retrieve the vertical extent of the image shape.
-	 * @return The image heigth
-	 */
-	private final native double getHeight() /*-{
-		return this.getHeight();
-	}-*/;
-	
-	/**
-	 * Assign the vertical extent of the image shape.
-	 * @return The image height
-	 */
-	private final native void setHeight(double height) /*-{
-		this.setHeight(height);
-	}-*/;
-	
-	/**
 	 * Retrieve the cropping area for the image shape.
 	 * @return The cropping area. The area is defined in coordinates relative to the image shape origin.
 	 */
@@ -114,39 +82,4 @@ public class Image extends Shape {
 			height: box.@net.edzard.kinetic.Box2d::bottom - box.@net.edzard.kinetic.Box2d::top
 		});
 	}-*/;
-	
-	/**
-	 * Animate a linear transition of this image shape.
-	 * @param target Another image shape - defines the characteristics that the current image shape will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @return An object for controlling the transition.
-	 */
-	public final Transition transitionTo(Image target, double duration) {
-		return transitionTo(target, duration, null, null);
-	}
-	
-	/**
-	 * Animate a transition of this image shape.
-	 * Transition of cropping area will only work if cropping area has been set.
-	 * @param target Another image shape - defines the characteristics that the current image shape will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @param ease An easing function that defines how the transition will take place
-	 * @param callback A function that will be called at the end of the animation
-	 * @return An object for controlling the transition.
-	 */
-	public final Transition transitionTo(Image target, double duration, EasingFunction ease, Runnable callback) {
-		StringBuffer sb = new StringBuffer();
-		
-		if (this.getWidth() != target.getWidth()) sb.append("width:").append(target.getWidth()).append(",");
-		if (this.getHeight() != target.getHeight()) sb.append("height:").append(target.getHeight()).append(",");
-		
-		Box2d crop = target.getCrop();
-		if (!Double.isNaN(crop.right) && !Double.isNaN(crop.bottom)) {
-			if (this.getCrop() != target.getCrop()) {
-				sb.append("crop:{x:").append(crop.left).append(",").append("y:").append(crop.top).append(",");
-				sb.append("width:").append(crop.right - crop.left).append(",").append("height:").append(crop.bottom - crop.top).append("},");
-			}
-		}
-		return transitionToShape(target, sb, duration, ease, callback);
-	}
 }

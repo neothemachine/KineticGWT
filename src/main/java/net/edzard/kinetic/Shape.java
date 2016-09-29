@@ -278,36 +278,6 @@ public abstract class Shape extends Node {
 	}-*/;
 	
 	/**
-	 * Animate a transition of the shape.
-	 * Used internally to compose transitions.
-	 * Don't use directly - use methods exposed by specialized shapes.
-	 * @param target The target node (has to be the same type of node as the one on which this method is called)
-	 * @param sb The composition buffer for the transition configuration
-	 * @param duration The duration of the transition
-	 * @param ease An easing function
-	 * @param callback Will be called at the end of the transition
-	 * @return An object to control the transition animation
-	 */
-	final Transition transitionToShape(Shape target, StringBuffer sb, double duration, EasingFunction ease, Runnable callback) {
-		if (this.getStrokeWidth() != target.getStrokeWidth()) sb.append("strokeWidth:").append(target.getStrokeWidth()).append(",");
-		return transitionToNode(target, sb, duration, ease, callback);
-	}
-
-	/**
-	 * Check if a point is within the shape.
-	 * @param point The coordinate to check
-	 * @return True, if within the shape
-	 */
-	// Fix by asmiov6 (issue #16):
-	// I needed the intersects method so I made it public. Than it failed because kineticjs handled the parameter as an array and did not find the x and y. So I changed the parameter to an array, now it works allright.
-	public final native boolean intersects(Vector2d point) /*-{
-	    return this.intersects([
-	        point.@net.edzard.kinetic.Vector2d::x,
-	        point.@net.edzard.kinetic.Vector2d::y
-	    ]);
-	}-*/;
-	
-	/**
 	 * Set a custom drawing callback function.
 	 * @param fct Will be called whenever Kinetic decides to redraw the shape
 	 */

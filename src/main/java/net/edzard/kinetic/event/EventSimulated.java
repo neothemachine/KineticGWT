@@ -1,11 +1,14 @@
-package net.edzard.kinetic;
+package net.edzard.kinetic.event;
+
+import net.edzard.kinetic.Shape;
+import net.edzard.kinetic.Vector2d;
 
 /**
  * Used to communicate input events.
  * @author Ed
  */
 @Deprecated
-public class Event {
+public class EventSimulated {
 
 	/**
 	 * The event's type.
@@ -66,7 +69,7 @@ public class Event {
 	 * Parmetrized Ctor.
 	 * @param type An event type
 	 */
-	public Event(Type type, Button button, int x, int y) {
+	public EventSimulated(Type type, Button button, int x, int y) {
 		this.type = type;
 		this.button = button;
 		this.x = x;

@@ -23,10 +23,8 @@ public class Kinetic {
 	public static String defaultFillColour = Colour.white.toString();
 	/** Default stroke colour (black) */
 	public static String defaultStrokeColour = Colour.black.toString();
-	
 	/** Default fill colour for text (black) */
 	public static String defaultTextFillColour = Colour.black.toString();
-	
 	/** Default line cap style (ROUND) */
 	public static String defaultLineCap = LineCap.ROUND.toString();
 	/** Default line join style (ROUND) */
@@ -34,12 +32,32 @@ public class Kinetic {
 	
 	/** Default font family (Arial) */
 	public static String defaultFontFamily = "Arial";
-	/** Default font size (14) */
-	public static int defaultFontSize = 12;
+	/** Default font size in pixels */
+	public static int defaultFontSize = 15;
 	/** Default font style (normal) */
 	public static String defaultFontStyle = Text.FontStyle.NORMAL.toString(); 
 	/** Default dragability == Is a node dragable? (true) */ 
 	public static boolean defaultDragability = true;
+	
+	/**
+	 * Create a node with JSON string. De-serialization does not generate custom shape drawing functions,
+	 * images, or event handlers (this would make the serialized object huge). If your app uses custom shapes,
+	 * images, and event handlers (it probably does), then you need to select the appropriate shapes after
+	 * loading the stage and set these properties via on(), setDrawFunc(), and setImage() methods 
+	 */
+	public static native final Node createNode(String json) /*-{
+		return $wnd.Kinetic.Node.create(json);
+	}-*/;
+	
+	/**
+	 * Create a stage with JSON string. De-serialization does not generate custom shape drawing functions,
+	 * images, or event handlers (this would make the serialized object huge). If your app uses custom shapes,
+	 * images, and event handlers (it probably does), then you need to select the appropriate shapes after
+	 * loading the stage and set these properties via on(), setDrawFunc(), and setImage() methods
+	 */
+	public static native final Node createStage(String json, Element stageContainer) /*-{
+		return $wnd.Kinetic.Node.create(json, stageContainer);
+	}-*/;
 
 	/**
 	 * Create a new stage object.
@@ -261,7 +279,7 @@ public class Kinetic {
 		  x: position.@net.edzard.kinetic.Vector2d::x,
 		  y: position.@net.edzard.kinetic.Vector2d::y,
 		  text: aText,
-		  textFill: @net.edzard.kinetic.Kinetic::defaultTextFillColour,
+		  fill: @net.edzard.kinetic.Kinetic::defaultTextFillColour,
 		  fontStyle: @net.edzard.kinetic.Kinetic::defaultFontStyle,
 		  fontSize: @net.edzard.kinetic.Kinetic::defaultFontSize,
 		  fontFamily: @net.edzard.kinetic.Kinetic::defaultFontFamily,

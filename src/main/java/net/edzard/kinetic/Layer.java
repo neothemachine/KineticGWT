@@ -21,38 +21,6 @@ public class Layer extends Container {
 	}-*/;
 	
 	/**
-	 * Draw this layer.
-	 */
-	public final native void draw()  /*-{
-		this.draw();
-	}-*/;
-	
-	/**
-	 * Animate a linear transition of this layer object.
-	 * @param target Another layer object - defines the characteristics that the current layer object will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @return An object for controlling the transition.
-	 */
-	// Delegates to node (no special properties to animate)
-	public final Transition transitionTo(Node target, double duration) {
-		return transitionTo(target, duration, null, null);
-	}
-	
-	/**
-	 * Animate a transition of this layer object.
-	 * @param target Another layer object - defines the characteristics that the current layer object will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @param ease An easing function that defines how the transition will take place
-	 * @param callback A function that will be called at the end of the animation
-	 * @return An object for controlling the transition.
-	 */
-	// Delegates to node (no special properties to animate)
-	public final Transition transitionTo(Node target, double duration, EasingFunction ease, Runnable callback) {
-		StringBuffer sb = new StringBuffer();
-		return transitionToNode(target, sb, duration, ease, callback);
-	}
-	
-	/**
 	 * Assign a callback handler for execution after each drawing operation.
 	 * @param callback The callback handler to execute
 	 */

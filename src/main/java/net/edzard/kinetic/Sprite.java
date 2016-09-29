@@ -136,30 +136,4 @@ public class Sprite extends Shape {
 	public final native void stop() /*-{
 		return this.stop();
 	}-*/;
-
-	/**
-	 * Animate a linear transition of this sprite shape.
-	 * @param target Another sprite shape - defines the characteristics that the current sprite shape will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @return An object for controlling the transition.
-	 */
-	public final Transition transitionTo(Sprite target, double duration) {
-		return transitionTo(target, duration, null, null);
-	}
-	
-	/**
-	 * Animate a transition of this sprite shape.
-	 * The kineticjs framework does not seem to be able to animate the sprite's framerate.
-	 * @param target Another sprite shape - defines the characteristics that the current sprite shape will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @param ease An easing function that defines how the transition will take place
-	 * @param callback A function that will be called at the end of the animation
-	 * @return An object for controlling the transition.
-	 */
-	public final Transition transitionTo(Sprite target, double duration, EasingFunction ease, Runnable callback) {
-		StringBuffer sb = new StringBuffer();
-		if (this.getFrameRate() != target.getFrameRate()) sb.append("frameRate:").append(target.getFrameRate()).append(",");
-		return transitionToShape(target, sb, duration, ease, callback);
-	}
-	
 }

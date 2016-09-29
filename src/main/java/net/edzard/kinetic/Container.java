@@ -2,6 +2,8 @@ package net.edzard.kinetic;
 
 import java.util.List;
 
+import com.google.gwt.core.client.JsArray;
+
 /**
  * Base class for all nodes that contain other child nodes.
  * @author Ed
@@ -24,21 +26,18 @@ public class Container extends Node {
 
 	/**
 	 * Retrieve a child node of this container.
-	 * Two selection prefixes are supported:
+	 * The following selectors are supported:
 	 * <ul>
 	 * <li>Use '#' to select a node by a previously assigned unique ID (e.g. '#foo')
 	 * <li>Use '.' to select a number of nodes with the same name (e.g. '.bar')
+	 * <li>Use type or class name to select certain types (e.g. 'Text')
+	 * <li>Use ", " to seperate selectors.
 	 * </ul>
 	 * @param selector The selector string
-	 * @return A list of matching nodes
+	 * @return An array of matching nodes
 	 */
-	public final native List<Node> get(String selector) /*-{
-		var selection = this.get(selector);
-		var list = @java.util.ArrayList::new()();
-		for (var i=0; i < selection.length; ++i) {
-			list.@java.util.ArrayList::add(Ljava/lang/Object;)(selection[i]);
-		}
-		return list;
+	public final native JsArray<Node> find(String selector) /*-{
+		return this.find(selector).toArray();
 	}-*/;
 	
 	/**
@@ -72,10 +71,16 @@ public class Container extends Node {
 	}-*/;
 
 	/** 
-	 * Remove all child nodes from this container.
+	 * Remove all child nodes from this container (doesn't destroy them).
 	 */
 	public final native void removeChildren() /*-{
 		this.removeChildren();
 	}-*/;
-
+	
+	/** 
+	 * Remove and destroy all child nodes of this container.
+	 */
+	public final native void destroyChildren() /*-{
+		this.destroyChildren();
+	}-*/;
 }

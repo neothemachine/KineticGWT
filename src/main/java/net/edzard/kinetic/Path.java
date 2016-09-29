@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Defines a path using a variety of drawing commans.
+ * Defines a path using a variety of drawing commands.
  * Paths are used to define custom shapes. The path object uses command chaining, which enables you to specify complete paths by using combined statements.
  * For example: new Path().beginPath().moveTo(new Vector2d(200,50)).lineTo(new Vector2d(420,80)).quadraticCurveTo(new Vector2d(300, 100), new Vector2d(260, 170)).closePath();
  * @author Ed
@@ -624,4 +624,35 @@ public class Path {
 		return commands;
 	}
 	
+	/**
+	 * Convert this path into the SVG standard path.
+	 * @return The current list of path commands
+	 */
+	public String toSVGPath()
+	{
+		StringBuilder sb = new StringBuilder();
+		for(Command c : commands)
+		{
+			switch (c.type)
+			{
+				case BEGIN:
+					// do nothing
+					break;
+				case CLOSE:
+					sb.append('Z');
+					break;
+				case LINE:
+					LineToCommand ltc = (LineToCommand)c;
+					sb.append("L" + ltc.getPosition().x + ',' + ltc.getPosition().y);
+					break;
+				case MOVE:
+					MoveToCommand mtc = (MoveToCommand)c;
+					sb.append("M" + mtc.getPosition().x + ',' + mtc.getPosition().y);
+					break;
+				default:
+					throw new UnsupportedOperationException(c.type.name());
+			}
+		}
+		return sb.toString();
+	}
 }

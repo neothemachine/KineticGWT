@@ -47,7 +47,7 @@ public class TextPath extends Shape {
 	}-*/;
 	
 	/**
-	 * Retrieve the font size used by this text shape.
+	 * Retrieve the font size (in pixels) used by this text shape.
 	 * @return The font size
 	 */
 	public final native int getFontSize() /*-{
@@ -55,7 +55,7 @@ public class TextPath extends Shape {
 	}-*/;
 	
 	/**
-	 * Assign the font size used by this text shape.
+	 * Assign the font size (in pixels) used by this text shape.
 	 * @param size A font size
 	 */
 	public final native void setFontSize(int size) /*-{
@@ -165,29 +165,4 @@ public class TextPath extends Shape {
 	public final native int getTextWidth() /*-{
 		return this.getTextWidth();
 	}-*/;
-	
-	/**
-	 * Animate a linear transition of this text shape.
-	 * @param target Another text shape - defines the characteristics that the current text shape will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @return An object for controlling the transition.
-	 */
-	public final Transition transitionTo(TextPath target, double duration) {
-		return transitionTo(target, duration, null, null);
-	}
-	
-	/**
-	 * Animate a transition of this text shape.
-	 * @param target Another text shape - defines the characteristics that the current text shape will have at the end of the animation
-	 * @param duration The time it will take for the animation to complete, in seconds
-	 * @param ease An easing function that defines how the transition will take place
-	 * @param callback A function that will be called at the end of the animation
-	 * @return An object for controlling the transition.
-	 */
-	public final Transition transitionTo(TextPath target, double duration, EasingFunction ease, Runnable callback) {
-		StringBuffer sb = new StringBuffer();
-		if (this.getFontSize() != target.getFontSize()) sb.append("fontSize:").append(target.getFontSize()).append(",");
-		if (this.getTextStrokeWidth() != target.getTextStrokeWidth()) sb.append("textStrokeWidth:").append(target.getTextStrokeWidth()).append(",");
-		return transitionToShape(target, sb, duration, ease, callback);
-	}
 }
